@@ -1,0 +1,14 @@
+# Web server
+flask>=3.0.0
+flask-cors>=4.0.0
+
+# chatpersona backend dependencies (from chatpersona-backend/pyproject.toml)
+click
+langchain-chroma
+langchain-core
+langchain-ollama
+rich
+typer
+
+# Install chatpersona itself as editable (run separately):
+#   pip install -e ./chatpersona-backend
