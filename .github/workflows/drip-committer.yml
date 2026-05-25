@@ -1,0 +1,46 @@
+﻿name: Daily Drip Committer
+
+on:
+  schedule:
+    # Runs at 14:00 UTC every day
+    - cron: '0 14 * * *'
+  workflow_dispatch: # allow manual triggering
+
+permissions:
+  contents: write
+
+jobs:
+  drip-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Git Config
+        run: |
+          git config --global user.name "Gpar377"
+          git config --global user.email "gpar377@github.com"
+          
+      - name: Apply a Patch
+        run: |
+          # Find the first patch file in .github/patches/
+          PATCH_FILE=ls .github/patches/*.patch 2>/dev/null | head -n 1
+          
+          if [ -z "$PATCH_FILE" ]; then
+            echo "No patches left to apply."
+            exit 0
+          fi
+          
+          echo "Applying patch: $PATCH_FILE"
+          
+          # Apply the patch and use the CURRENT DATE for the commit
+          # This satisfies the heatmap
+          git am --committer-date-is-author-date --ignore-date "$PATCH_FILE"
+          
+          # Remove the applied patch
+          rm "$PATCH_FILE"
+          
+          # Push the applied code + the deleted patch file
+          git push origin main
