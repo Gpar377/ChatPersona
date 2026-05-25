@@ -1,0 +1,27 @@
+From dd02e598b40a24232b19e26882b8ae51a65e4dc6 Mon Sep 17 00:00:00 2001
+From: Gpar377 <gpar377@github.com>
+Date: Mon, 25 May 2026 16:30:29 +0530
+Subject: [PATCH 4/5] style: apply native whatsapp chat doodle wallpaper
+ pattern
+
+---
+ frontend/style.css | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/frontend/style.css b/frontend/style.css
+index c8871d5..5a71547 100644
+--- a/frontend/style.css
++++ b/frontend/style.css
+@@ -88,3 +88,9 @@ html, body { height: 100%; background: var(--wa-panel); color: var(--wa-text-1);
+ .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+ .toast.success { border-bottom: 2px solid var(--wa-primary); }
+ .toast.error   { border-bottom: 2px solid var(--danger); }
++
++/* WhatsApp Doodle Default Chat Wallpaper */
++.chat-box {
++  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23dfdfdf' fill-opacity='0.025' d='M25 0h25v25H25zM75 0h25v25H75zM0 25h25v25H0zM50 25h25v25H50zM25 50h25v25H25zM75 50h25v25H75zM0 75h25v25H0zM50 75h25v25H50z'/%3E%3C/svg%3E");
++  background-size: 80px 80px;
++}
+-- 
+2.50.1.windows.1
+
