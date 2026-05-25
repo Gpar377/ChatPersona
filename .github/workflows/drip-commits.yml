@@ -1,0 +1,47 @@
+﻿name: Drip Commits
+
+on:
+  schedule:
+    # Runs at 14:00 UTC (around 7:30 PM IST) every day
+    - cron: '0 14 * * *'
+  workflow_dispatch:
+
+jobs:
+  drip:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config --global user.name 'Gpar377'
+          git config --global user.email 'gopaparthiv@gmail.com'
+
+      - name: Apply 2 Patches
+        run: |
+          if [ ! -d ".github/patches" ]; then
+            echo "No patches directory found."
+            exit 0
+          fi
+          
+          PATCHES=$(find .github/patches -type f -name "*.patch" | sort | head -n 2)
+          
+          if [ -z "$PATCHES" ]; then
+            echo "No patches left to apply!"
+            exit 0
+          fi
+          
+          for PATCH in $PATCHES; do
+            echo "Applying $PATCH..."
+            git am --ignore-date "$PATCH"
+            git rm "$PATCH"
+            git commit --amend --no-edit
+          done
+          
+          git push

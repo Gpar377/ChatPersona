@@ -1,0 +1,179 @@
+From c461ade4c105badbd7d375a0cc5aa4ffd86341f2 Mon Sep 17 00:00:00 2001
+From: Gpar377 <gpar377@github.com>
+Date: Mon, 25 May 2026 16:18:29 +0530
+Subject: [PATCH 1/2] feat: redesign structure to match WhatsApp Web interface
+
+---
+ frontend/index.html | 103 +++++++++++++++++++++-----------------------
+ 1 file changed, 48 insertions(+), 55 deletions(-)
+
+diff --git a/frontend/index.html b/frontend/index.html
+index f35b7b0..27a0cf8 100644
+--- a/frontend/index.html
++++ b/frontend/index.html
+@@ -1,4 +1,4 @@
+-<!DOCTYPE html>
++﻿<!DOCTYPE html>
+ <html lang="en">
+ <head>
+   <meta charset="UTF-8" />
+@@ -6,14 +6,10 @@
+   <title>ChatPersona — Talk to Memories</title>
+   <meta name="description" content="Upload a WhatsApp chat export and have a conversation with an AI persona built from real messages." />
+   <link rel="preconnect" href="https://fonts.googleapis.com" />
+-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
++  <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;500;600&display=swap" rel="stylesheet" />
+   <link rel="stylesheet" href="style.css" />
+ </head>
+ <body>
+-  <!-- Ambient background blobs -->
+-  <div class="bg-blob blob-1"></div>
+-  <div class="bg-blob blob-2"></div>
+-  <div class="bg-blob blob-3"></div>
+ 
+   <div class="app-shell">
+ 
+@@ -21,10 +17,10 @@
+     <aside class="sidebar" id="sidebar">
+       <div class="sidebar-header">
+         <div class="logo">
+-          <span class="logo-icon">🧠</span>
+-          <span class="logo-text">ChatPersona</span>
++          <!-- Default WA style header just has a profile circle and some icons, but we'll adapt -->
++          <div class="profile-avatar" style="width: 40px; height: 40px; font-size: 1.1rem; background: #dfe5e7;">👤</div>
++          <span class="logo-text">Chats</span>
+         </div>
+-        <p class="logo-tagline">Talk to memories</p>
+       </div>
+ 
+       <!-- Ollama status -->
+@@ -33,48 +29,47 @@
+         <span id="statusText">Checking Ollama…</span>
+       </div>
+ 
+-      <!-- Upload section -->
+-      <div class="sidebar-section">
+-        <h3 class="section-label">New Persona</h3>
+-
+-        <div class="upload-zone" id="uploadZone">
+-          <div class="upload-icon">📂</div>
+-          <p>Drop your WhatsApp<br/><code>.txt</code> export here</p>
+-          <label class="btn-upload" for="fileInput">Choose file</label>
+-          <input type="file" id="fileInput" accept=".txt" hidden />
+-          <span class="upload-filename" id="uploadFilename"></span>
+-        </div>
++      <!-- Upload section (acts like 'create new chat' panel) -->
++      <div class="sidebar-content">
++        <div class="sidebar-section">
++          <h3 class="section-label">Create Persona</h3>
++
++          <div class="upload-zone" id="uploadZone">
++            <div class="upload-icon">📁</div>
++            <p>Drop your WhatsApp<br/><code>.txt</code> export here</p>
++            <label class="btn-upload" for="fileInput">Choose file</label>
++            <input type="file" id="fileInput" accept=".txt" hidden />
++            <span class="upload-filename" id="uploadFilename"></span>
++          </div>
+ 
+-        <div class="form-field">
+-          <label for="personaInput">Persona name</label>
+-          <input id="personaInput" type="text" placeholder="e.g. Arjun" autocomplete="off" />
+-        </div>
++          <div class="form-field">
++            <input id="personaInput" type="text" placeholder="Persona / Friend's Name" autocomplete="off" />
++          </div>
+ 
+-        <div class="form-field">
+-          <label for="partnerInput">Your name <span class="optional">(optional)</span></label>
+-          <input id="partnerInput" type="text" placeholder="e.g. You" autocomplete="off" />
+-        </div>
++          <div class="form-field">
++            <input id="partnerInput" type="text" placeholder="Your Name (optional)" autocomplete="off" />
++          </div>
+ 
+-        <div class="form-field">
+-          <label for="modelSelect">Model</label>
+-          <select id="modelSelect">
+-            <option value="">Auto-detect</option>
+-          </select>
+-        </div>
++          <div class="form-field" style="margin-top: 5px;">
++            <select id="modelSelect">
++              <option value="">Auto-detect Model</option>
++            </select>
++          </div>
+ 
+-        <button class="btn-primary" id="uploadBtn" onclick="uploadFile()">
+-          <span class="btn-icon">⚡</span> Build Persona
+-        </button>
+-        <div class="upload-progress" id="uploadProgress">
+-          <div class="progress-bar" id="progressBar"></div>
++          <button class="btn-primary" id="uploadBtn" onclick="uploadFile()">
++            <span class="btn-icon">💬</span> Start
++          </button>
++          <div class="upload-progress" id="uploadProgress">
++            <div class="progress-bar" id="progressBar"></div>
++          </div>
+         </div>
+-      </div>
+ 
+-      <!-- Profiles list -->
+-      <div class="sidebar-section">
+-        <h3 class="section-label">Personas <span id="profileCount"></span></h3>
+-        <div class="profile-list" id="profileList">
+-          <p class="empty-state">No personas yet.<br/>Upload a chat to begin.</p>
++        <!-- Profiles list -->
++        <div class="sidebar-section" style="flex:1; border-bottom: none; gap: 0;">
++          <!-- removed section label h3 to make the list right under the creator feeling more app like -->
++          <div class="profile-list" id="profileList">
++            <p class="empty-state">No personas yet.<br/>Upload a chat to begin.</p>
++          </div>
+         </div>
+       </div>
+     </aside>
+@@ -85,13 +80,9 @@
+       <!-- Empty / landing state -->
+       <div class="landing" id="landing">
+         <div class="landing-icon">💬</div>
+-        <h1>Start a conversation</h1>
+-        <p>Select a persona from the sidebar or upload a new WhatsApp chat export to begin chatting.</p>
+-        <div class="landing-steps">
+-          <div class="step"><span>1</span> Upload a <code>.txt</code> WhatsApp export</div>
+-          <div class="step"><span>2</span> Name the person to emulate</div>
+-          <div class="step"><span>3</span> Start chatting — the AI replies as them</div>
+-        </div>
++        <h1>WhatsApp Web</h1>
++        <p>Send and receive messages without keeping your phone online.<br/>Upload a chat on the left to start a conversation with your cloned friends.</p>
++        <div class="landing-steps" style="display:none;"></div>
+       </div>
+ 
+       <!-- Active chat -->
+@@ -102,20 +93,22 @@
+             <h2 id="chatPersonaName">Persona</h2>
+             <p id="chatPersonaModel" class="chat-subtitle">llama3.2</p>
+           </div>
+-          <button class="btn-clear" id="clearBtn" title="Clear session memory" onclick="clearSession()">↺ Clear</button>
++          <button class="btn-clear" id="clearBtn" title="Clear chat" onclick="clearSession()">⟳ Reset</button>
+         </div>
+ 
+         <div class="chat-box" id="chatBox"></div>
+ 
+         <div class="input-area">
++          <div style="font-size:1.5rem; color:var(--wa-text-2); cursor:pointer; padding:0 8px;">😊</div>
++          <div style="font-size:1.5rem; color:var(--wa-text-2); cursor:pointer; padding:0 8px;">📎</div>
+           <textarea
+             id="messageInput"
+-            placeholder="Type a message…"
++            placeholder="Type a message"
+             rows="1"
+             onkeydown="handleKey(event)"
+           ></textarea>
+           <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
++            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
+               <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+             </svg>
+           </button>
+-- 
+2.50.1.windows.1
+
