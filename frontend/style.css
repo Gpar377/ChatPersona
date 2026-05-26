@@ -74,7 +74,10 @@ html, body { height: 100%; background: var(--wa-panel); color: var(--wa-text-1);
 .msg-group.user { align-self: flex-end; align-items: flex-end; }
 .msg-group.bot  { align-self: flex-start; align-items: flex-start; }
 .msg-sender { display: none; }
-.bubble { padding: 6px 12px 8px; border-radius: 7.5px; font-size: 0.95rem; line-height: 1.4; word-wrap: break-word; white-space: pre-wrap; position: relative; box-shadow: 0 1px 0.5px rgba(11,20,26,0.13); }
+.bubble { padding: 6px 12px 8px; border-radius: 7.5px; font-size: 0.95rem; line-height: 1.4; word-wrap: break-word; white-space: pre-wrap; position: relative; box-shadow: 0 1px 0.5px rgba(11,20,26,0.13); display: flex; flex-direction: row; align-items: flex-end; gap: 12px; }
+.bubble .msg-text { flex: 1; }
+.bubble .timestamp { font-size: 0.68rem; color: var(--wa-text-2); display: flex; align-items: center; gap: 4px; margin-bottom: -2px; flex-shrink: 0; }
+.system-msg { background: #1c282f; color: #ffd279; font-size: 0.75rem; padding: 6px 12px; border-radius: 6px; align-self: center; text-align: center; margin: 8px 10%; box-shadow: 0 1px 0.5px rgba(11,20,26,0.13); }
 .msg-group.user .bubble { background: var(--wa-msg-out); color: var(--wa-text-1); border-top-right-radius: 0; }
 .msg-group.bot .bubble { background: var(--wa-msg-in); color: var(--wa-text-1); border-top-left-radius: 0; }
 .input-area { background: var(--wa-header); padding: 10px 16px; display: flex; align-items: center; gap: 12px; }

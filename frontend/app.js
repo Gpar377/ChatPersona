@@ -205,7 +205,7 @@ function selectProfile(slug, persona, partner, model) {
 
   document.getElementById("messageInput").focus();
 
-  appendSystemMsg(`You're now chatting with the AI persona of ${persona}. Say hello!`);
+  appendSystemMsg("🔒 Messages and calls are end-to-end encrypted. No one outside of this chat, not even ChatPersona, can read or listen to them.");
 }
 
 async function deleteProfile(e, slug) {
@@ -276,7 +276,7 @@ async function clearSession() {
   if (!activeSlug) return;
   await fetch(`${API}/sessions/${activeSlug}`, { method: "DELETE" });
   document.getElementById("chatBox").innerHTML = "";
-  appendSystemMsg("Session memory cleared. Starting fresh.");
+  appendSystemMsg("🔒 Messages and calls are end-to-end encrypted. No one outside of this chat, not even ChatPersona, can read or listen to them.");
 }
 
 // ──────────────────────────────────────────
@@ -300,7 +300,24 @@ function appendBubbles(lines, type, sender) {
     if (!line.trim()) return;
     const bubble = document.createElement("div");
     bubble.className = "bubble";
-    bubble.textContent = line;
+    
+    // Text component
+    const textSpan = document.createElement("span");
+    textSpan.className = "msg-text";
+    textSpan.textContent = line;
+    bubble.appendChild(textSpan);
+    
+    // Timestamp + read receipts
+    const timeSpan = document.createElement("span");
+    timeSpan.className = "timestamp";
+    const now = new Date();
+    timeSpan.innerHTML = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    
+    if (type === "user") {
+      timeSpan.innerHTML += `<svg class="read-ticks" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 15" width="15" height="15"><path fill="#53bdeb" d="M15.01 3.316l-.478-.372a.365.365 0 0 0-.51.063L8.666 9.879a.32.32 0 0 1-.484.033l-.358-.325a.319.319 0 0 0-.484.032l-.378.483a.418.418 0 0 0 .036.541l1.32 1.266c.143.14.346.125.484-.033l6.272-8.048a.366.366 0 0 0-.064-.512zm-4.1 0l-.478-.372a.365.365 0 0 0-.51.063L4.566 9.879a.32.32 0 0 1-.484.033L1.891 7.769a.366.366 0 0 0-.515.006l-.423.433a.364.364 0 0 0 .006.514l3.258 3.185c.143.14.346.125.484-.033l6.272-8.048a.365.365 0 0 0-.063-.51z"/></svg>`;
+    }
+    
+    bubble.appendChild(timeSpan);
     group.appendChild(bubble);
   });
 
@@ -312,20 +329,23 @@ function appendBubbles(lines, type, sender) {
 function appendSystemMsg(text) {
   const box = document.getElementById("chatBox");
   const el  = document.createElement("div");
-  el.style.cssText = "text-align:center;font-size:0.75rem;color:var(--text-3);padding:6px 0;";
+  el.className = "system-msg";
   el.textContent = text;
   box.appendChild(el);
   box.scrollTop = box.scrollHeight;
 }
 
 function appendTyping() {
-  const box = document.getElementById("chatBox");
-  const el  = document.createElement("div");
-  el.className = "typing-bubble";
-  el.innerHTML = `<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>`;
-  box.appendChild(el);
-  box.scrollTop = box.scrollHeight;
-  return el;
+  const subtitle = document.getElementById("chatPersonaModel");
+  const original = subtitle.textContent;
+  subtitle.textContent = "typing...";
+  subtitle.style.color = "var(--wa-primary)";
+  return {
+    remove: () => {
+      subtitle.textContent = original;
+      subtitle.style.color = "";
+    }
+  };
 }
 
 // ──────────────────────────────────────────
