@@ -1,0 +1,32 @@
+.DS_Store
+__pycache__/
+*.py[cod]
+*.egg-info/
+.coverage
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.venv/
+venv/
+build/
+dist/
+
+# Local persona data and generated retrieval artifacts.
+.chatpersona/
+chat_artifacts/
+chrome_langchain_db/
+**/chroma_db/
+**/*.sqlite3
+**/reply_examples.jsonl
+
+# Keep real chat exports outside the repo.
+exports/
+chat_exports/
+local_exports/
+*.chat.txt
+*.export.txt
+*.whatsapp.txt
+
+# Allow synthetic test fixtures.
+!tests/fixtures/
+!tests/fixtures/*.txt

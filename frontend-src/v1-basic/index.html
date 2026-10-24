@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ChatPersona</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app">
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h2>ChatPersona</h2>
+    <p class="tagline">Talk to memories</p>
+<div class="file-upload">
+  <label for="fileInput" class="file-label">
+    📁 Upload Chat
+  </label>
+  <span id="fileName">No file chosen</span>
+  <input type="file" id="fileInput" hidden />
+</div>
+  </div>
+
+  <!-- Chat Area -->
+  <div class="chat-area">
+
+    <div id="chatBox" class="chat-box"></div>
+
+    <div class="input-area">
+      <input type="text" id="message" placeholder="Type a message...">
+      <button onclick="sendMessage()">➤</button>
+    </div>
+
+  </div>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

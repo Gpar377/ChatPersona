@@ -1,0 +1,110 @@
+From 5c0236407400a8d6d98543e1b89ca2930eefd643 Mon Sep 17 00:00:00 2001
+From: Gpar377 <gpar377@github.com>
+Date: Mon, 25 May 2026 16:30:09 +0530
+Subject: [PATCH 3/5] feat: implement native whatsapp message states and
+ encryption UI
+
+---
+ frontend/app.js    | 42 +++++++++++++++++++++++++++++++-----------
+ frontend/style.css |  5 ++++-
+ 2 files changed, 35 insertions(+), 12 deletions(-)
+
+diff --git a/frontend/app.js b/frontend/app.js
+index 11be2a4..87cc740 100644
+--- a/frontend/app.js
++++ b/frontend/app.js
+@@ -205,7 +205,7 @@ function selectProfile(slug, persona, partner, model) {
+ 
+   document.getElementById("messageInput").focus();
+ 
+-  appendSystemMsg(`You're now chatting with the AI persona of ${persona}. Say hello!`);
++  appendSystemMsg("🔒 Messages and calls are end-to-end encrypted. No one outside of this chat, not even ChatPersona, can read or listen to them.");
+ }
+ 
+ async function deleteProfile(e, slug) {
+@@ -276,7 +276,7 @@ async function clearSession() {
+   if (!activeSlug) return;
+   await fetch(`${API}/sessions/${activeSlug}`, { method: "DELETE" });
+   document.getElementById("chatBox").innerHTML = "";
+-  appendSystemMsg("Session memory cleared. Starting fresh.");
++  appendSystemMsg("🔒 Messages and calls are end-to-end encrypted. No one outside of this chat, not even ChatPersona, can read or listen to them.");
+ }
+ 
+ // ──────────────────────────────────────────
+@@ -300,7 +300,24 @@ function appendBubbles(lines, type, sender) {
+     if (!line.trim()) return;
+     const bubble = document.createElement("div");
+     bubble.className = "bubble";
+-    bubble.textContent = line;
++    
++    // Text component
++    const textSpan = document.createElement("span");
++    textSpan.className = "msg-text";
++    textSpan.textContent = line;
++    bubble.appendChild(textSpan);
++    
++    // Timestamp + read receipts
++    const timeSpan = document.createElement("span");
++    timeSpan.className = "timestamp";
++    const now = new Date();
++    timeSpan.innerHTML = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
++    
++    if (type === "user") {
++      timeSpan.innerHTML += `<svg class="read-ticks" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 15" width="15" height="15"><path fill="#53bdeb" d="M15.01 3.316l-.478-.372a.365.365 0 0 0-.51.063L8.666 9.879a.32.32 0 0 1-.484.033l-.358-.325a.319.319 0 0 0-.484.032l-.378.483a.418.418 0 0 0 .036.541l1.32 1.266c.143.14.346.125.484-.033l6.272-8.048a.366.366 0 0 0-.064-.512zm-4.1 0l-.478-.372a.365.365 0 0 0-.51.063L4.566 9.879a.32.32 0 0 1-.484.033L1.891 7.769a.366.366 0 0 0-.515.006l-.423.433a.364.364 0 0 0 .006.514l3.258 3.185c.143.14.346.125.484-.033l6.272-8.048a.365.365 0 0 0-.063-.51z"/></svg>`;
++    }
++    
++    bubble.appendChild(timeSpan);
+     group.appendChild(bubble);
+   });
+ 
+@@ -312,20 +329,23 @@ function appendBubbles(lines, type, sender) {
+ function appendSystemMsg(text) {
+   const box = document.getElementById("chatBox");
+   const el  = document.createElement("div");
+-  el.style.cssText = "text-align:center;font-size:0.75rem;color:var(--text-3);padding:6px 0;";
++  el.className = "system-msg";
+   el.textContent = text;
+   box.appendChild(el);
+   box.scrollTop = box.scrollHeight;
+ }
+ 
+ function appendTyping() {
+-  const box = document.getElementById("chatBox");
+-  const el  = document.createElement("div");
+-  el.className = "typing-bubble";
+-  el.innerHTML = `<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>`;
+-  box.appendChild(el);
+-  box.scrollTop = box.scrollHeight;
+-  return el;
++  const subtitle = document.getElementById("chatPersonaModel");
++  const original = subtitle.textContent;
++  subtitle.textContent = "typing...";
++  subtitle.style.color = "var(--wa-primary)";
++  return {
++    remove: () => {
++      subtitle.textContent = original;
++      subtitle.style.color = "";
++    }
++  };
+ }
+ 
+ // ──────────────────────────────────────────
+diff --git a/frontend/style.css b/frontend/style.css
+index 37b053d..c8871d5 100644
+--- a/frontend/style.css
++++ b/frontend/style.css
+@@ -74,7 +74,10 @@ html, body { height: 100%; background: var(--wa-panel); color: var(--wa-text-1);
+ .msg-group.user { align-self: flex-end; align-items: flex-end; }
+ .msg-group.bot  { align-self: flex-start; align-items: flex-start; }
+ .msg-sender { display: none; }
+-.bubble { padding: 6px 12px 8px; border-radius: 7.5px; font-size: 0.95rem; line-height: 1.4; word-wrap: break-word; white-space: pre-wrap; position: relative; box-shadow: 0 1px 0.5px rgba(11,20,26,0.13); }
++.bubble { padding: 6px 12px 8px; border-radius: 7.5px; font-size: 0.95rem; line-height: 1.4; word-wrap: break-word; white-space: pre-wrap; position: relative; box-shadow: 0 1px 0.5px rgba(11,20,26,0.13); display: flex; flex-direction: row; align-items: flex-end; gap: 12px; }
++.bubble .msg-text { flex: 1; }
++.bubble .timestamp { font-size: 0.68rem; color: var(--wa-text-2); display: flex; align-items: center; gap: 4px; margin-bottom: -2px; flex-shrink: 0; }
++.system-msg { background: #1c282f; color: #ffd279; font-size: 0.75rem; padding: 6px 12px; border-radius: 6px; align-self: center; text-align: center; margin: 8px 10%; box-shadow: 0 1px 0.5px rgba(11,20,26,0.13); }
+ .msg-group.user .bubble { background: var(--wa-msg-out); color: var(--wa-text-1); border-top-right-radius: 0; }
+ .msg-group.bot .bubble { background: var(--wa-msg-in); color: var(--wa-text-1); border-top-left-radius: 0; }
+ .input-area { background: var(--wa-header); padding: 10px 16px; display: flex; align-items: center; gap: 12px; }
+-- 
+2.50.1.windows.1
+

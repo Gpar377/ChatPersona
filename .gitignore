@@ -1,0 +1,24 @@
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Uploaded chat exports — NEVER commit real chats
+uploads/*.txt
+
+# chatpersona local profiles (stored in ~/.chatpersona/)
+# (nothing in this repo should reference them)
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
